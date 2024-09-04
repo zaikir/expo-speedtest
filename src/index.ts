@@ -1,2 +1,2 @@
 export { startMeasure } from "./speedtest";
-export * from "./use-zustand-store";
+export * from "./create-zustand-store";

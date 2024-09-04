@@ -40,7 +40,7 @@ const defaultState = {
   results: { download: null, upload: null, ping: null },
 };
 
-export const useZustandStore = (create: Create) => {
+export const createZustandStore = (create: Create) => {
   return create<SpeedTestStore>((set) => ({
     status: "ready" as const,
     ...defaultState,
