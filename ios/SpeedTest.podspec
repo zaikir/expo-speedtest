@@ -21,9 +21,9 @@ Pod::Spec.new do |s|
     'SWIFT_COMPILATION_MODE' => 'wholemodule'
   }
 
-  s.source_files = "**/*.{h,m,swift}"
+  s.source_files = "**/*.{h,m,mm,swift,hpp,cpp}"
   s.subspec 'Speedmeasure' do |ss|
-    ss.source_files = "Speedmeasure.xcframework/lib/*.{h,m,swift}"
+    ss.source_files = "Speedmeasure.xcframework/lib/*.{h,m,mm,swift,hpp,cpp}"
     ss.vendored_frameworks = 'Speedmeasure.xcframework'
   end
 end
