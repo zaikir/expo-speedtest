@@ -2,8 +2,8 @@ import { EventEmitter, requireNativeModule } from "expo-modules-core";
 
 import { MeasureConfig } from "./types";
 
-const SpeedtestModule = requireNativeModule("Speedtest");
-const emitter = new EventEmitter(SpeedtestModule);
+const SpeedTestModule = requireNativeModule("SpeedTest");
+const emitter = new EventEmitter(SpeedTestModule);
 
 export async function startMeasure({
   types,
@@ -26,5 +26,5 @@ export async function startMeasure({
     onMeasureProgress?.(e.type, e.result, e.progress);
   });
 
-  await SpeedtestModule.startMeasure(types.join(","), refreshInterval ?? 100);
+  await SpeedTestModule.startMeasure(types.join(","), refreshInterval ?? 100);
 }
