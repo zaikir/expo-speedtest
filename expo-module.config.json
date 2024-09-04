@@ -1,0 +1,9 @@
+{
+  "platforms": ["ios"],
+  "ios": {
+    "modules": ["SpeedTestModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.speedtest.SpeedTestModule"]
+  }
+}
