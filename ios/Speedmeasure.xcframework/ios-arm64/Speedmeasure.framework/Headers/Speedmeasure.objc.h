@@ -40,7 +40,7 @@ FOUNDATION_EXPORT NSString* _Nonnull const SpeedmeasureTestDownload;
 FOUNDATION_EXPORT NSString* _Nonnull const SpeedmeasureTestPing;
 FOUNDATION_EXPORT NSString* _Nonnull const SpeedmeasureTestUpload;
 
-FOUNDATION_EXPORT int64_t SpeedmeasurePing(NSString* _Nullable hostname);
+FOUNDATION_EXPORT int64_t SpeedmeasurePing(NSString* _Nullable hostname, long timeout);
 
 FOUNDATION_EXPORT NSString* _Nonnull SpeedmeasureRun(NSString* _Nullable Tests, id<SpeedmeasureOnReadyHandler> _Nullable OnReadyHandler, id<SpeedmeasureOnTestStartHandler> _Nullable OnTestStartHandler, id<SpeedmeasureOnTestFinishHandler> _Nullable OnTestFinishHandler, id<SpeedmeasureOnProgressHandler> _Nullable OnProgressHandler);
 
