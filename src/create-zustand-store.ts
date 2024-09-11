@@ -22,7 +22,7 @@ type Create = {
   <S extends StoreApi<unknown>>(store: S): UseBoundStore<S>;
 };
 
-export type SpeedTestProps = {
+type SpeedTestProps = {
   refreshRate?: number;
   tests?: MeasureType[];
 };

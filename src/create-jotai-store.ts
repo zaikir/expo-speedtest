@@ -3,7 +3,7 @@ import { useCallback, useMemo } from "react";
 import { startMeasure } from "./speedtest";
 import { MeasureType } from "./types";
 
-export type SpeedTestProps = {
+type SpeedTestProps = {
   refreshRate?: number;
   tests?: MeasureType[];
 };
