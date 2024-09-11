@@ -60,8 +60,8 @@ public class SpeedTestModule: Module {
 
     Events("onMeasureReady", "onMeasureStart", "onMeasureFinish", "onMeasureProgress")
   
-    AsyncFunction("ping") { (hostname: String) in
-        return try await SpeedmeasurePing(hostname)
+    AsyncFunction("ping") { (hostname: String, timeout: Int) in
+        return try await SpeedmeasurePing(hostname, timeout)
     }
 
     AsyncFunction("startMeasure") { (types: String, interval: Double) in
