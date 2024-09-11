@@ -29,6 +29,6 @@ export async function startMeasure({
   await SpeedTestModule.startMeasure(types.join(","), refreshInterval ?? 100);
 }
 
-export async function ping(host: string) {
-  return SpeedTestModule.ping(host);
+export async function ping(host: string, timeout = 3000) {
+  return SpeedTestModule.ping(host, timeout);
 }
