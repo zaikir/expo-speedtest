@@ -6,7 +6,7 @@ import type {
   UseBoundStore,
 } from "zustand";
 
-import { startMeasure } from "./speedtest";
+import { startMeasure, ping } from "./speedtest";
 import { MeasureType } from "./types";
 
 type Create = {
@@ -80,5 +80,6 @@ export const createZustandStore = (create: Create) => {
 
       return data.ip;
     },
+    ping,
   }));
 };

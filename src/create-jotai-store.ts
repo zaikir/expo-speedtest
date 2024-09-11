@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
-import { startMeasure } from "./speedtest";
+import { startMeasure, ping } from "./speedtest";
 import { MeasureType } from "./types";
 
 type SpeedTestProps = {
@@ -26,23 +26,15 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
   const { atom, getDefaultStore } = jotai;
   const store = getDefaultStore();
 
-  return () => {
-    const statusAtom = useMemo(
-      () => atom<"ready" | "testing">(defaultState.status),
-      [],
-    );
-    const resultsAtom = useMemo(
-      () => atom<SpeedTestStore["results"]>(defaultState.results),
-      [],
-    );
-    const progressAtom = useMemo(
-      () =>
-        atom<{ type: MeasureType; result: number; percent: number } | null>(
-          defaultState.progress,
-        ),
-      [],
-    );
+  const statusAtom = atom<"ready" | "testing">(defaultState.status);
+  const resultsAtom = atom<SpeedTestStore["results"]>(defaultState.results);
+  const progressAtom = atom<{
+    type: MeasureType;
+    result: number;
+    percent: number;
+  } | null>(defaultState.progress);
 
+  return () => {
     const start = useCallback(async (params?: SpeedTestProps) => {
       const refreshRate = params?.refreshRate ?? 100;
       const tests = params?.tests ?? [
@@ -88,6 +80,7 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
       progressAtom,
       start,
       getIpAddress,
+      ping,
     };
   };
 };
