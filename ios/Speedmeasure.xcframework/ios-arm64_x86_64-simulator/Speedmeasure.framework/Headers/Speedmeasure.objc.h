@@ -11,9 +11,6 @@
 #include "Universe.objc.h"
 
 
-@class SpeedmeasureProgressHandler;
-@class SpeedmeasureTestFinishHandler;
-@class SpeedmeasureTestStartHandler;
 @protocol SpeedmeasureOnProgressHandler;
 @class SpeedmeasureOnProgressHandler;
 @protocol SpeedmeasureOnReadyHandler;
@@ -39,36 +36,11 @@
 - (void)handle:(NSString* _Nullable)test;
 @end
 
-@interface SpeedmeasureProgressHandler : NSObject <goSeqRefInterface, SpeedmeasureOnProgressHandler> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-- (void)handle:(NSString* _Nullable)test result:(double)result progress:(double)progress;
-@end
-
-@interface SpeedmeasureTestFinishHandler : NSObject <goSeqRefInterface, SpeedmeasureOnTestFinishHandler> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-- (void)handle:(NSString* _Nullable)test result:(double)result;
-@end
-
-@interface SpeedmeasureTestStartHandler : NSObject <goSeqRefInterface, SpeedmeasureOnTestStartHandler> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-- (void)handle:(NSString* _Nullable)test;
-@end
-
 FOUNDATION_EXPORT NSString* _Nonnull const SpeedmeasureTestDownload;
 FOUNDATION_EXPORT NSString* _Nonnull const SpeedmeasureTestPing;
 FOUNDATION_EXPORT NSString* _Nonnull const SpeedmeasureTestUpload;
+
+FOUNDATION_EXPORT int64_t SpeedmeasurePing(NSString* _Nullable hostname);
 
 FOUNDATION_EXPORT NSString* _Nonnull SpeedmeasureRun(NSString* _Nullable Tests, id<SpeedmeasureOnReadyHandler> _Nullable OnReadyHandler, id<SpeedmeasureOnTestStartHandler> _Nullable OnTestStartHandler, id<SpeedmeasureOnTestFinishHandler> _Nullable OnTestFinishHandler, id<SpeedmeasureOnProgressHandler> _Nullable OnProgressHandler);
 

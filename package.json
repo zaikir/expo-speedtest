@@ -1,6 +1,6 @@
 {
   "name": "@kirz/expo-speedtest",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Measure internet latency, download and upload speed",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -32,6 +32,7 @@
     "@types/react": "^18.0.25",
     "expo-module-scripts": "^3.5.2",
     "expo-modules-core": "^1.12.20",
+    "jotai": "^2.9.3",
     "zustand": "^4.5.5"
   },
   "peerDependencies": {
