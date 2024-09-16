@@ -60,58 +60,64 @@ public class SpeedTestModule: Module {
 
     Events("onMeasureReady", "onMeasureStart", "onMeasureFinish", "onMeasureProgress")
   
-    AsyncFunction("ping") { (hostname: String, timeout: Int) in
-        return try await SpeedmeasurePing(hostname, timeout)
+    AsyncFunction("ping") { (hostname: String, timeout: Int, promise: Promise) in
+        DispatchQueue.global(qos: .background).async {
+            promise.resolve( SpeedmeasurePing(hostname, timeout))
+        }
     }
 
-    AsyncFunction("startMeasure") { (types: String, interval: Double) in
+    AsyncFunction("startMeasure") { (types: String, interval: Double, promise: Promise) in
         var timer: Timer?
         var currentResult = 0.0
         var currentProgress = 0.0
 
-        SpeedmeasureRun(
-            types,
-            SpeedMeasureReadyHandler { () in
-                DispatchQueue.main.async {
-                    self.sendEvent("onMeasureReady")
-                }
-            },
-            SpeedMeasureStartHandler { test in
-                currentResult = 0.0
-                currentProgress = 0.0
-                
-                DispatchQueue.main.async {
-                    self.sendEvent("onMeasureStart", [
-                        "type": test
-                    ])
+        DispatchQueue.global(qos: .background).async {
+            SpeedmeasureRun(
+                types,
+                SpeedMeasureReadyHandler { () in
+                    DispatchQueue.main.async {
+                        self.sendEvent("onMeasureReady")
+                    }
+                },
+                SpeedMeasureStartHandler { test in
+                    currentResult = 0.0
+                    currentProgress = 0.0
+                    
+                    DispatchQueue.main.async {
+                        self.sendEvent("onMeasureStart", [
+                            "type": test
+                        ])
 
-                    timer = Timer.scheduledTimer(withTimeInterval: interval / 1000.0, repeats: true) { _ in
-                        DispatchQueue.main.async {
-                            self.sendEvent("onMeasureProgress", [
-                                "type": test,
-                                "result": currentResult,
-                                "progress": currentProgress
-                            ])
+                        timer = Timer.scheduledTimer(withTimeInterval: interval / 1000.0, repeats: true) { _ in
+                            DispatchQueue.main.async {
+                                self.sendEvent("onMeasureProgress", [
+                                    "type": test,
+                                    "result": currentResult,
+                                    "progress": currentProgress
+                                ])
+                            }
                         }
                     }
-                }
-            },
-            SpeedMeasureFinishHandler { test, result in
-                timer?.invalidate()
-                timer = nil
+                },
+                SpeedMeasureFinishHandler { test, result in
+                    timer?.invalidate()
+                    timer = nil
 
-                DispatchQueue.main.async {
-                    self.sendEvent("onMeasureFinish", [
-                        "type": test,
-                        "result": result,
-                    ])
+                    DispatchQueue.main.async {
+                        self.sendEvent("onMeasureFinish", [
+                            "type": test,
+                            "result": result,
+                        ])
+                    }
+                },
+                SpeedMeasureProgressHandler { test, result, progress in
+                    currentResult = result
+                    currentProgress = progress
                 }
-            },
-            SpeedMeasureProgressHandler { test, result, progress in
-                currentResult = result
-                currentProgress = progress
-            }
-        )
+            )
+
+            promise.resolve()
+        }
     }
   }
 }
