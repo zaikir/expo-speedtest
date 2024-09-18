@@ -36,6 +36,11 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
 
   return () => {
     const start = useCallback(async (params?: SpeedTestProps) => {
+      if (store.get(statusAtom) === "testing") {
+        // already testing
+        return;
+      }
+
       const refreshRate = params?.refreshRate ?? 100;
       const tests = params?.tests ?? [
         "download" as const,
@@ -46,8 +51,6 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
       try {
         store.set(statusAtom, "testing");
 
-        const results = {} as SpeedTestStore["results"];
-
         await startMeasure({
           types: tests,
           refreshInterval: refreshRate,
@@ -55,8 +58,7 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
             store.set(progressAtom, { type, result: 0, percent: 0 });
           },
           onMeasureFinish(type, result) {
-            results[type] = result;
-            store.set(resultsAtom, results);
+            store.set(resultsAtom, (prev) => ({ ...prev, [type]: result }));
           },
           onMeasureProgress(type, result, progress) {
             store.set(progressAtom, { type, result, percent: progress });
