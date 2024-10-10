@@ -76,12 +76,20 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
       return data.ip;
     }, []);
 
+    const getIpInfo = useCallback(async () => {
+      const response = await fetch("https://ipapi.co/json/");
+      const data = await response.json();
+
+      return data;
+    }, []);
+
     return {
       statusAtom,
       resultsAtom,
       progressAtom,
       start,
       getIpAddress,
+      getIpInfo,
       ping,
     };
   };
