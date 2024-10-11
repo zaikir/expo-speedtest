@@ -50,6 +50,10 @@ export const createZustandStore = (create: Create) => {
     } = {}) => {
       try {
         set({ status: "testing", ...defaultState });
+        set({
+          results: { download: null, upload: null, ping: null },
+        });
+
         const results = {} as SpeedTestStore["results"];
 
         await startMeasure({
