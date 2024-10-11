@@ -55,6 +55,11 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
           types: tests,
           refreshInterval: refreshRate,
           onMeasureStart(type) {
+            store.set(resultsAtom, {
+              download: null,
+              upload: null,
+              ping: null,
+            });
             store.set(progressAtom, { type, result: 0, percent: 0 });
           },
           onMeasureFinish(type, result) {
