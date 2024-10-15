@@ -30,5 +30,5 @@ export async function startMeasure({
 }
 
 export async function ping(host: string, timeout = 3000) {
-  return SpeedTestModule.ping(host, timeout);
+  return SpeedTestModule.ping(host, timeout) as number;
 }
