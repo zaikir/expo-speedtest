@@ -64,6 +64,7 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
           },
           onMeasureFinish(type, result) {
             store.set(resultsAtom, (prev) => ({ ...prev, [type]: result }));
+            store.set(progressAtom, null);
           },
           onMeasureProgress(type, result, progress) {
             store.set(progressAtom, { type, result, percent: progress });
