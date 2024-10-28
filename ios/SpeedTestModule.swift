@@ -108,6 +108,10 @@ public class SpeedTestModule: Module {
                             "type": test,
                             "result": result,
                         ])
+                        
+                        if (types.hasSuffix(test!)) {
+                            promise.resolve()
+                        }
                     }
                 },
                 SpeedMeasureProgressHandler { test, result, progress in
@@ -116,7 +120,7 @@ public class SpeedTestModule: Module {
                 }
             )
 
-            promise.resolve()
+            
         }
     }
   }
