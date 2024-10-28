@@ -1,0 +1,8 @@
+framework module "Speeder" {
+	header "ref.h"
+    header "Speeder.objc.h"
+    header "Universe.objc.h"
+    header "Speeder.h"
+
+    export *
+}
