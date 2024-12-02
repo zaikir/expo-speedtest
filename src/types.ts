@@ -2,7 +2,8 @@ export type MeasureType = "ping" | "download" | "upload";
 
 export type MeasureConfig = {
   types: MeasureType[];
-  refreshInterval?: number;
+  // refreshInterval?: number;
+  duration?: number;
   onMeasureStart?: (type: MeasureType) => void;
   onMeasureFinish?: (type: MeasureType, result: number) => void;
   onMeasureProgress?: (

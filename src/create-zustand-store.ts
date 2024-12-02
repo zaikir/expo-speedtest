@@ -23,7 +23,7 @@ type Create = {
 };
 
 type SpeedTestProps = {
-  refreshRate?: number;
+  duration?: number;
   tests?: MeasureType[];
 };
 
@@ -45,7 +45,7 @@ export const createZustandStore = (create: Create) => {
     status: "ready" as const,
     ...defaultState,
     start: async ({
-      refreshRate = 100,
+      duration,
       tests = ["download" as const, "upload" as const, "ping" as const],
     } = {}) => {
       try {
@@ -58,7 +58,7 @@ export const createZustandStore = (create: Create) => {
 
         await startMeasure({
           types: tests,
-          refreshInterval: refreshRate,
+          duration,
           onMeasureStart(type) {
             set({
               progress: { type, result: 0, percent: 0 },

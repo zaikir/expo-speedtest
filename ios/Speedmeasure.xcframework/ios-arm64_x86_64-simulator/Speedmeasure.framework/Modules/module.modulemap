@@ -1,8 +1,0 @@
-framework module "Speedmeasure" {
-	header "ref.h"
-    header "Speedmeasure.objc.h"
-    header "Universe.objc.h"
-    header "Speedmeasure.h"
-
-    export *
-}

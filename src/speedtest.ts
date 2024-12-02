@@ -1,32 +1,60 @@
-import { EventEmitter, requireNativeModule } from "expo-modules-core";
+import { requireNativeModule } from "expo-modules-core";
 
+import { testDownload, testUpload } from "./speedtest-module";
 import { MeasureConfig } from "./types";
+import { percentile90 } from "./utils";
 
 const SpeedTestModule = requireNativeModule("SpeedTest");
-const emitter = new EventEmitter(SpeedTestModule);
+
+const MAX_PACKET_SIZE = 50e6; // 50 MB
+const DEFAULT_PACKET_SIZE = 1e6; // 1 MB
 
 export async function startMeasure({
   types,
-  refreshInterval,
+  duration = 10e3, // 10 seconds,
   onMeasureStart,
   onMeasureFinish,
   onMeasureProgress,
 }: MeasureConfig) {
-  emitter.removeAllListeners("onMeasureStart");
-  emitter.removeAllListeners("onMeasureFinish");
-  emitter.removeAllListeners("onMeasureProgress");
+  for (const type of types) {
+    let packetSize = DEFAULT_PACKET_SIZE;
+    let prevSpeed = 0;
 
-  emitter.addListener("onMeasureStart", (e: any) => {
-    onMeasureStart?.(e.type);
-  });
-  emitter.addListener("onMeasureFinish", (e: any) => {
-    onMeasureFinish?.(e.type, e.result);
-  });
-  emitter.addListener("onMeasureProgress", (e: any) => {
-    onMeasureProgress?.(e.type, e.result, e.progress);
-  });
+    const adjustPacketSize = (speed: number) => {
+      let newPacketSize =
+        speed > prevSpeed
+          ? Math.min(packetSize * 1.5, MAX_PACKET_SIZE)
+          : Math.max(packetSize / 1.5, DEFAULT_PACKET_SIZE);
+      newPacketSize = Math.round(newPacketSize / 1e6) * 1e6;
+      packetSize = newPacketSize;
+      prevSpeed = speed;
+    };
+    onMeasureStart?.(type);
 
-  await SpeedTestModule.startMeasure(types.join(","), refreshInterval ?? 100);
+    const speeds: number[] = [];
+    const currentTimelimit = Date.now() + duration;
+    const currentSpeed = 0;
+    while (Date.now() < currentTimelimit) {
+      const speed = await (type === "download" ? testDownload : testUpload)(
+        packetSize,
+      );
+      speeds.push(speed);
+      const currentSpeed = percentile90(speeds);
+      adjustPacketSize(currentSpeed);
+
+      onMeasureProgress?.(
+        type,
+        currentSpeed,
+        Math.min(
+          ((Date.now() - (currentTimelimit - duration)) / duration) * 100,
+          100,
+        ),
+      );
+    }
+
+    onMeasureProgress?.(type, currentSpeed, 100);
+    onMeasureFinish?.(type, currentSpeed);
+  }
 }
 
 export async function ping(host: string, timeout = 3000) {

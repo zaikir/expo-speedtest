@@ -4,7 +4,7 @@ import { startMeasure, ping } from "./speedtest";
 import { MeasureType } from "./types";
 
 type SpeedTestProps = {
-  refreshRate?: number;
+  duration?: number;
   tests?: MeasureType[];
 };
 
@@ -41,7 +41,7 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
         return;
       }
 
-      const refreshRate = params?.refreshRate ?? 100;
+      const duration = params?.duration;
       const tests = params?.tests ?? [
         "download" as const,
         "upload" as const,
@@ -58,7 +58,7 @@ export const createJotaiHook = (jotai: typeof import("jotai")) => {
 
         await startMeasure({
           types: tests,
-          refreshInterval: refreshRate,
+          duration,
           onMeasureStart(type) {
             store.set(progressAtom, { type, result: 0, percent: 0 });
           },
