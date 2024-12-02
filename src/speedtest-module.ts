@@ -96,4 +96,6 @@ async function testUpload(
   return calculateSpeedMbps(byteToSend, uploadTime);
 }
 
-export { testLatency, testDownload, testUpload };
+const testPing = SpeedtestModule.ping;
+
+export { testLatency, testDownload, testUpload, testPing };

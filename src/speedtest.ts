@@ -1,10 +1,6 @@
-import { requireNativeModule } from "expo-modules-core";
-
-import { testDownload, testUpload } from "./speedtest-module";
+import { testDownload, testUpload, testPing } from "./speedtest-module";
 import { MeasureConfig } from "./types";
 import { percentile90 } from "./utils";
-
-const SpeedTestModule = requireNativeModule("SpeedTest");
 
 const MAX_PACKET_SIZE = 50e6; // 50 MB
 const DEFAULT_PACKET_SIZE = 1e6; // 1 MB
@@ -58,5 +54,5 @@ export async function startMeasure({
 }
 
 export async function ping(host: string, timeout = 3000) {
-  return SpeedTestModule.ping(host, timeout) as number;
+  return testPing(host, timeout) as number;
 }

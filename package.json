@@ -1,6 +1,6 @@
 {
   "name": "@kirz/expo-speedtest",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Measure internet latency, download and upload speed",
   "files": [
     "build",
