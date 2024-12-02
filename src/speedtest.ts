@@ -29,13 +29,13 @@ export async function startMeasure({
 
     const speeds: number[] = [];
     const currentTimelimit = Date.now() + duration;
-    const currentSpeed = 0;
+    let currentSpeed = 0;
     while (Date.now() < currentTimelimit) {
       const speed = await (type === "download" ? testDownload : testUpload)(
         packetSize,
       );
       speeds.push(speed);
-      const currentSpeed = percentile90(speeds);
+      currentSpeed = percentile90(speeds);
       adjustPacketSize(currentSpeed);
 
       onMeasureProgress?.(
