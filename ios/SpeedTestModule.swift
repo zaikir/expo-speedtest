@@ -33,5 +33,17 @@ public class SpeedtestModule: Module {
             throw error
         }
     }
+    
+    AsyncFunction("measurePing") { (host: String, timeout: Double, promise: Promise) in
+          let pingUtility = PingUtility()
+
+          pingUtility.ping(host: host, timeout: timeout) { rtt in
+              if let rtt = rtt {
+                  promise.resolve(rtt)
+              } else {
+                  promise.reject(Exception(name: "TimeoutError", description: ""))
+              }
+          }
+      }
   }
 }
