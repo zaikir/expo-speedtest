@@ -11,7 +11,7 @@ public class SpeedtestModule: Module {
         Name("Speedtest")
 
         Function("generateMeasId") {
-            return metrics.generateMeasId()
+            return metrics.generateMeasurementId()
         }
 
         AsyncFunction("measureLatency") { (url: String, byteCount: Int) in
@@ -39,7 +39,7 @@ public class SpeedtestModule: Module {
         }
 
         AsyncFunction("measurePing") { (hostname: String, timeoutInterval: Double, promise: Promise) in
-            let pingOp = PingOperation(url: hostname, timeout: timeoutInterval, promise: promise)
+            let pingOp = PingOperation(address: hostname, timeoutInterval: timeoutInterval, promiseResolver: promise)
             self.pingOperations.append(pingOp)
             self.processNextPing()
         }
@@ -58,15 +58,15 @@ public class SpeedtestModule: Module {
         isCurrentlyPinging = true
 
         let pinger = GBPing()
-        pinger.host = nextOperation.url
-        if let timeout = nextOperation.timeout {
+        pinger.host = nextOperation.address
+        if let timeout = nextOperation.timeoutInterval {
             pinger.timeout = timeout
         }
         pinger.pingPeriod = 0.9
 
         let handler = PingDelegate(
-            promise: nextOperation.promise,
-            cleanup: { [weak self] in
+            promiseResolver: nextOperation.promiseResolver,
+            cleanupClosure: { [weak self] in
                 guard let self = self else { return }
                 self.isCurrentlyPinging = false
                 self.pingOperations.removeFirst()
@@ -86,7 +86,7 @@ public class SpeedtestModule: Module {
                     handler.cleanupIfNeeded()
                 }
             } else {
-                nextOperation.promise.reject(
+                nextOperation.promiseResolver.reject(
                     "PING_SETUP_ERROR", error?.localizedDescription ?? "Unknown error during setup."
                 )
                 handler.cleanupIfNeeded()
