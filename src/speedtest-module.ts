@@ -96,6 +96,15 @@ async function testUpload(
   return calculateSpeedMbps(byteToSend, uploadTime);
 }
 
-const testPing = SpeedtestModule.ping;
+/**
+ * Run a test to measure the latency to a given host
+ * @param host The hostname or IP address of the host to ping
+ * @param timeout The timeout in milliseconds. Defaults to 1000.
+ * @returns The latency in milliseconds
+ */
+async function testPing(host: string, timeout: number) {
+  const ping = await SpeedtestModule.measurePing(host, timeout / 1000);
+  return ping as number;
+}
 
 export { testLatency, testDownload, testUpload, testPing };

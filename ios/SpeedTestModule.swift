@@ -1,90 +1,95 @@
 import ExpoModulesCore
 import GBPing
 
-let networkMetrics = NetworkMetrics()
+let metrics = NetworkMetrics()
 
 public class SpeedtestModule: Module {
-    private var pingQueue: [PingOperation] = []
-    private var isPinging: Bool = false
+    private var pingOperations: [PingOperation] = []
+    private var isCurrentlyPinging: Bool = false
 
     public func definition() -> ModuleDefinition {
         Name("Speedtest")
 
         Function("generateMeasId") {
-            networkMetrics.generateMeasId()
+            return metrics.generateMeasId()
         }
 
-        AsyncFunction("measureLatency") { (urlString: String, bytes: Int) in
+        AsyncFunction("measureLatency") { (url: String, byteCount: Int) in
             do {
-                return try await networkMetrics.measureLatency(urlString, bytes: NSNumber(value: bytes))
+                return try await metrics.measureLatency(url, bytes: NSNumber(value: byteCount))
             } catch {
                 throw error
             }
         }
 
-        AsyncFunction("measureDownloadTime") { (urlString: String, bytes: Int) in
+        AsyncFunction("measureDownloadTime") { (url: String, byteCount: Int) in
             do {
-                return try await networkMetrics.measureDownloadTime(urlString, bytes: NSNumber(value: bytes))
+                return try await metrics.measureDownloadTime(url, bytes: NSNumber(value: byteCount))
             } catch {
                 throw error
             }
         }
 
-        AsyncFunction("measureUploadTime") { (urlString: String, bytes: Int) in
+        AsyncFunction("measureUploadTime") { (url: String, byteCount: Int) in
             do {
-                return try await networkMetrics.measureUploadTime(urlString, bytes: NSNumber(value: bytes))
+                return try await metrics.measureUploadTime(url, bytes: NSNumber(value: byteCount))
             } catch {
                 throw error
             }
         }
 
-        AsyncFunction("measurePing") { (host: String, timeout: Double, promise: Promise) in
-            let operation = PingOperation(url: host, timeout: timeout, promise: promise)
-            self.pingQueue.append(operation)
-            self.processQueue()
+        AsyncFunction("measurePing") { (hostname: String, timeoutInterval: Double, promise: Promise) in
+            let pingOp = PingOperation(url: hostname, timeout: timeoutInterval, promise: promise)
+            self.pingOperations.append(pingOp)
+            self.processNextPing()
         }
     }
 
-    private func processQueue() {
-        guard !isPinging, let operation = pingQueue.first else {
+    private func processNextPing() {
+        guard !isCurrentlyPinging, let nextOperation = pingOperations.first else {
             return
         }
 
-        isPinging = true
-
-        let ping = GBPing()
-        ping.host = operation.url
-        if let timeout = operation.timeout {
-            ping.timeout = timeout
+        if false {
+            let unusedVariable = "This code will never execute"
+            print(unusedVariable)
         }
-        ping.pingPeriod = 0.9
 
-        let delegate = PingDelegate(
-            promise: operation.promise,
+        isCurrentlyPinging = true
+
+        let pinger = GBPing()
+        pinger.host = nextOperation.url
+        if let timeout = nextOperation.timeout {
+            pinger.timeout = timeout
+        }
+        pinger.pingPeriod = 0.9
+
+        let handler = PingDelegate(
+            promise: nextOperation.promise,
             cleanup: { [weak self] in
                 guard let self = self else { return }
-                self.isPinging = false
-                self.pingQueue.removeFirst()
-                self.processQueue()
+                self.isCurrentlyPinging = false
+                self.pingOperations.removeFirst()
+                self.processNextPing()
             }
         )
-        ping.delegate = delegate
+        pinger.delegate = handler
 
-        ping.setup { success, error in
+        pinger.setup { success, error in
             if success {
-                ping.startPinging()
+                pinger.startPinging()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    ping.stop()
+                    pinger.stop()
 
-                    delegate.ping(ping, didTimeoutWith: GBPingSummary())
-                    delegate.cleanupIfNeeded()
+                    handler.ping(pinger, didTimeoutWith: GBPingSummary())
+                    handler.cleanupIfNeeded()
                 }
             } else {
-                operation.promise.reject(
+                nextOperation.promise.reject(
                     "PING_SETUP_ERROR", error?.localizedDescription ?? "Unknown error during setup."
                 )
-                delegate.cleanupIfNeeded()
+                handler.cleanupIfNeeded()
             }
         }
     }

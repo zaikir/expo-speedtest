@@ -19,12 +19,12 @@ export async function startMeasure({
       let currentPing = 0;
       const pings: number[] = [];
       for (let i = 0; i < 10; i++) {
-        let ping = 1000;
+        let result = 1000;
         try {
-          ping = await testPing("8.8.8.8");
+          result = await ping("8.8.8.8");
         } catch {}
 
-        pings.push(ping);
+        pings.push(result);
         currentPing = percentile90(pings);
         onMeasureProgress?.(type, currentPing, 100);
       }
@@ -73,6 +73,6 @@ export async function startMeasure({
   }
 }
 
-export async function ping(host: string, timeout = 3000) {
-  return testPing(host, timeout) as number;
+export async function ping(host: string, timeout = 1000) {
+  return testPing(host, timeout);
 }

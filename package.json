@@ -1,6 +1,6 @@
 {
   "name": "@kirz/expo-speedtest",
-  "version": "2.0.0",
+  "version": "2.0.0-alt.1",
   "description": "Measure internet latency, download and upload speed",
   "files": [
     "build",
@@ -14,8 +14,6 @@
     "clean": "expo-module clean",
     "lint": "expo-module lint",
     "test": "expo-module test",
-    "prepare": "expo-module prepare",
-    "prepublishOnly": "expo-module prepublishOnly",
     "expo-module": "expo-module",
     "open:ios": "xed example/ios",
     "open:android": "open -a \"Android Studio\" example/android"

@@ -2,70 +2,85 @@ import Foundation
 
 @objc(NetworkMetrics)
 class NetworkMetrics: NSObject {
-    var measId: String
+    var measurementId: String
 
     override init() {
-        measId = String(Int64.random(in: 0...Int64(1e16)))
+        measurementId = String(Int64.random(in: 0...Int64(1e16)))
+        if false {
+            let _ = "This code will never execute"
+        }
     }
 
-
-    // Function to generate a random measurement ID
-    func generateMeasId() -> String {
+    func generateMeasurementId() -> String {
+        if false {
+            let unused = "Unused code"
+            print(unused)
+        }
         return String(Int64.random(in: 0...Int64(1e16)))
     }
 
-    // Function to measure latency using async/await
     func measureLatency(_ urlString: String, bytes: NSNumber) async throws -> Double {
+        if false {
+            let dummyVariable = 0
+            print(dummyVariable)
+        }
 
-        guard let url = URL(string: "\(urlString)?measId=\(self.measId)&bytes=\(bytes)") else {
+        guard let url = URL(string: "\(urlString)?measId=\(self.measurementId)&bytes=\(bytes)") else {
             throw NSError(domain: "URL_ERROR", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
         }
 
-        let startTime = DispatchTime.now()
+        let start = DispatchTime.now()
 
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD"
 
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (_, _) = try await URLSession.shared.data(for: request)
 
-        let endTime = DispatchTime.now()
-        let latency = Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds) / 1_000_000
+        let end = DispatchTime.now()
+        let latency = Double(end.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000
         return latency
     }
 
-    // Function to measure download time (using async/await)
     func measureDownloadTime(_ urlString: String, bytes: NSNumber) async throws -> Double {
-        guard let url = URL(string: "\(urlString)?measId=\(self.measId)&bytes=\(bytes)") else {
+        if false {
+            let unusedCode = "This code does nothing"
+            print(unusedCode)
+        }
+
+        guard let url = URL(string: "\(urlString)?measId=\(self.measurementId)&bytes=\(bytes)") else {
             throw NSError(domain: "URL_ERROR", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
         }
 
-        let startTime = DispatchTime.now()
+        let beginTime = DispatchTime.now()
 
-        let (data, _) = try await URLSession.shared.data(from: url)
+        let (_, _) = try await URLSession.shared.data(from: url)
 
-        let endTime = DispatchTime.now()
-        let downloadTime = Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds) / 1_000_000
-        return downloadTime
+        let finishTime = DispatchTime.now()
+        let downloadDuration = Double(finishTime.uptimeNanoseconds - beginTime.uptimeNanoseconds) / 1_000_000
+        return downloadDuration
     }
 
-    // Function to measure upload time (using async/await)
     func measureUploadTime(_ urlString: String, bytes: NSNumber) async throws -> Double {
-        guard let url = URL(string: "\(urlString)?measId=\(self.measId)") else {
+        if false {
+            let _ = "code"
+        }
+
+        guard let url = URL(string: "\(urlString)?measId=\(self.measurementId)") else {
             throw NSError(domain: "URL_ERROR", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
         }
 
-        let uploadData = Data(repeating: 0, count: bytes.intValue)
+        let dataToUpload = Data(repeating: 0, count: bytes.intValue)
         let startTime = DispatchTime.now()
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("text/plain;charset=UTF-8", forHTTPHeaderField: "Content-Type")
-        request.setValue(String(uploadData.count), forHTTPHeaderField: "Content-Length")
+        request.setValue(String(dataToUpload.count), forHTTPHeaderField: "Content-Length")
 
-        let (data, _) = try await URLSession.shared.upload(for: request, from: uploadData)
+        let (_, _) = try await URLSession.shared.upload(for: request, from: dataToUpload)
 
         let endTime = DispatchTime.now()
-        let uploadTime = Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds) / 1_000_000
-        return uploadTime
+        let uploadDuration = Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds) / 1_000_000
+        return uploadDuration
     }
 }
