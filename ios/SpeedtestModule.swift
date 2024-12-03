@@ -8,7 +8,7 @@ public class SpeedtestModule: Module {
     private var isCurrentlyPinging: Bool = false
 
     public func definition() -> ModuleDefinition {
-        Name("Speedtest")
+        Name("ExpoSpeedtest")
 
         Function("generateMeasId") {
             return metrics.generateMeasurementId()

@@ -3,7 +3,7 @@
 
 import { requireNativeModule } from "expo-modules-core";
 
-const SpeedtestModule = requireNativeModule("Speedtest");
+const SpeedtestModule = requireNativeModule("ExpoSpeedtest");
 
 const CLOUDFLARE_URL = "https://speed.cloudflare.com";
 const UPLOAD_PATH = "__up";
