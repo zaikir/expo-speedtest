@@ -1,51 +1,52 @@
-import Foundation
+import ExpoModulesCore
 import GBPing
 
-class PingUtility: NSObject, GBPingDelegate {
-    private var pinger: GBPing?
-    private var pingCompletion: ((Double?) -> Void)?
+class PingOperation {
+  let url: String
+  let timeout: TimeInterval?
+  let promise: Promise
 
-    func ping(host: String, timeout: TimeInterval = 3.0, completion: @escaping (Double?) -> Void) {
-        self.pingCompletion = completion
-        let ping = GBPing()
-        ping.host = host
-        ping.timeout = timeout
-        ping.delegate = self
-        ping.pingPeriod = 1.0 // Time between pings
+  init(url: String, timeout: TimeInterval?, promise: Promise) {
+    self.url = url
+    self.timeout = timeout
+    self.promise = promise
+  }
+}
 
-        ping.setup { [weak self] success, error in
-            guard let self = self else { return }
-            if success {
-                ping.startPinging()
-                DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
-                    self.stopPinging()
-                    self.pingCompletion?(nil) // Timeout
-                }
-            } else {
-                self.pingCompletion?(nil) // Setup failure
-            }
-        }
-        self.pinger = ping
+class PingDelegate: NSObject, GBPingDelegate {
+  private let promise: Promise
+  private let cleanup: () -> Void
+  private var didCleanup: Bool = false  // Prevent double cleanup
+
+  init(promise: Promise, cleanup: @escaping () -> Void) {
+    self.promise = promise
+    self.cleanup = cleanup
+  }
+
+  func cleanupIfNeeded() {
+    if !didCleanup {
+      didCleanup = true
+      cleanup()
     }
+  }
 
-    func stopPinging() {
-        pinger?.stop()
-        pinger = nil
-    }
+  func ping(_ pinger: GBPing, didReceiveReplyWith summary: GBPingSummary) {
+    promise.resolve(summary.rtt * 1000)  // RTT in milliseconds
+    cleanupIfNeeded()
+  }
 
-    // MARK: - GBPingDelegate
+  func ping(_ pinger: GBPing, didTimeoutWith summary: GBPingSummary) {
+    promise.reject("PING_TIMEOUT", "Ping timed out: \(summary)")
+    cleanupIfNeeded()
+  }
 
-    func ping(_ pinger: GBPing!, didReceiveReplyWith summary: GBPingSummary!) {
-        self.pingCompletion?(summary.rtt) // Return RTT
-        stopPinging()
-    }
+  func ping(_ pinger: GBPing, didFailWithError error: Error) {
+    promise.reject("PING_ERROR", "Ping failed with error: \(error.localizedDescription)")
+    cleanupIfNeeded()
+  }
 
-    func ping(_ pinger: GBPing!, didFailWithError error: Error!) {
-        self.pingCompletion?(nil) // Error occurred
-        stopPinging()
-    }
-
-    func ping(_ pinger: GBPing!, didReceiveUnexpectedReplyWith summary: GBPingSummary!) {
-        // Handle unexpected replies if needed
-    }
+  func ping(_ pinger: GBPing, didFailToSendPingWith summary: GBPingSummary, error: Error) {
+    promise.reject("PING_SEND_ERROR", "Failed to send ping: \(error.localizedDescription)")
+    cleanupIfNeeded()
+  }
 }

@@ -13,6 +13,26 @@ export async function startMeasure({
   onMeasureProgress,
 }: MeasureConfig) {
   for (const type of types) {
+    if (type === "ping") {
+      onMeasureStart?.(type);
+
+      let currentPing = 0;
+      const pings: number[] = [];
+      for (let i = 0; i < 10; i++) {
+        let ping = 1000;
+        try {
+          ping = await testPing("8.8.8.8");
+        } catch {}
+
+        pings.push(ping);
+        currentPing = percentile90(pings);
+        onMeasureProgress?.(type, currentPing, 100);
+      }
+
+      onMeasureFinish?.(type, currentPing);
+      return;
+    }
+
     let packetSize = DEFAULT_PACKET_SIZE;
     let prevSpeed = 0;
 
